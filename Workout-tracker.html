@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>My Workout Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#0A0A0F;color:#E8E8F0;font-family:'DM Mono','Courier New',monospace;min-height:100vh;}
+  ::-webkit-scrollbar{width:4px;}
+  ::-webkit-scrollbar-track{background:#111;}
+  ::-webkit-scrollbar-thumb{background:#333;border-radius:2px;}
+  button{font-family:'DM Mono','Courier New',monospace;cursor:pointer;}
+  input{font-family:'DM Mono','Courier New',monospace;}
+  input:focus{outline:none;}
+  .check-bounce{animation:bounce 0.4s cubic-bezier(.36,.07,.19,.97);}
+  @keyframes bounce{0%,100%{transform:scale(1);}30%{transform:scale(1.4);}60%{transform:scale(0.9);}}
+  .header{background:linear-gradient(135deg,#0A0A0F 0%,#12121A 100%);border-bottom:1px solid #1E1E2E;padding:24px 20px 20px;position:sticky;top:0;z-index:100;}
+  .header-inner{max-width:520px;margin:0 auto;}
+  .header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+  .title-label{font-size:11px;letter-spacing:4px;color:#555;text-transform:uppercase;margin-bottom:4px;}
+  .title-main{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;color:#fff;line-height:1;}
+  .edit-btn{background:transparent;border:1px solid #2A2A3A;color:#666;padding:6px 14px;border-radius:6px;font-size:11px;letter-spacing:2px;transition:all 0.2s;}
+  .edit-btn.active{background:#7C3AED22;border-color:#7C3AED;color:#A78BFA;}
+  .week-nav{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+  .nav-btn{background:none;border:1px solid #222;color:#666;width:28px;height:28px;border-radius:4px;font-size:14px;display:flex;align-items:center;justify-content:center;}
+  .week-label{flex:1;text-align:center;font-size:11px;letter-spacing:1px;}
+  .week-sub{font-size:10px;color:#333;margin-top:2px;}
+  .progress-bar-wrap{display:flex;align-items:center;gap:12px;}
+  .progress-bar-bg{flex:1;height:4px;background:#1E1E2E;border-radius:2px;overflow:hidden;}
+  .progress-bar-fill{height:100%;border-radius:2px;transition:width 0.4s ease;}
+  .progress-count{font-size:11px;letter-spacing:1px;min-width:60px;text-align:right;}
+  .content{max-width:520px;margin:0 auto;padding:16px 16px 80px;}
+  .day-card{background:#0E0E18;border-radius:12px;margin-bottom:12px;overflow:hidden;transition:border-color 0.3s;}
+  .day-header{display:flex;align-items:center;gap:14px;padding:16px 18px;cursor:pointer;user-select:none;}
+  .day-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Bebas Neue',sans-serif;font-size:18px;}
+  .day-info{flex:1;min-width:0;}
+  .day-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;margin-bottom:2px;}
+  .day-title{font-size:14px;color:#E8E8F0;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .day-progress-row{display:flex;align-items:center;gap:8px;margin-top:6px;}
+  .day-pb-bg{height:2px;flex:1;background:#1A1A28;border-radius:1px;overflow:hidden;}
+  .day-pb-fill{height:100%;transition:width 0.4s ease;}
+  .day-count{font-size:10px;letter-spacing:1px;}
+  .all-btn{padding:6px 10px;border-radius:6px;font-size:10px;letter-spacing:1px;flex-shrink:0;transition:all 0.2s;}
+  .chevron{color:#333;font-size:12px;}
+  .exercises-wrap{border-top-width:1px;border-top-style:solid;}
+  .rest-row{padding:8px 18px;font-size:10px;color:#444;letter-spacing:2px;border-bottom:1px solid #111;}
+  .ex-row{display:flex;align-items:center;gap:14px;padding:13px 18px;transition:background 0.3s;position:relative;}
+  .ex-row:not(:last-child){border-bottom:1px solid #111;}
+  .checkbox{width:22px;height:22px;border-radius:5px;border-width:2px;border-style:solid;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;cursor:pointer;}
+  .ex-info{flex:1;min-width:0;}
+  .ex-name{display:flex;align-items:center;gap:6px;font-size:13px;transition:color 0.2s;}
+  .ex-name.done{color:#666;text-decoration:line-through;}
+  .key-tag{font-size:9px;background:#FF6B3522;color:#FF6B35;padding:1px 5px;border-radius:3px;letter-spacing:1px;}
+  .ex-sets{font-size:10px;color:#444;margin-top:2px;letter-spacing:1px;}
+  .ex-actions{display:flex;gap:6px;opacity:0;transition:opacity 0.2s;}
+  .ex-row:hover .ex-actions{opacity:1;}
+  .edit-row{display:flex;gap:8px;flex-wrap:wrap;flex:1;}
+  .edit-input{background:#1A1A28;border-radius:4px;padding:4px 8px;color:#fff;font-size:12px;border-width:1px;border-style:solid;}
+  .add-ex-btn{padding:12px 18px;display:flex;align-items:center;gap:10px;cursor:pointer;font-size:12px;border-top:1px solid #111;transition:color 0.2s;background:none;border-left:none;border-right:none;border-bottom:none;color:#333;width:100%;text-align:left;}
+  .note-row{padding:10px 18px 14px;font-size:11px;color:#444;font-style:italic;border-top:1px solid #111;}
+  .summary-card{margin-top:8px;padding:16px 18px;background:#0E0E18;border:1px solid #1A1A28;border-radius:12px;}
+  .summary-label{font-size:10px;color:#444;letter-spacing:3px;margin-bottom:12px;}
+  .summary-bars{display:flex;gap:8px;}
+  .summary-bar-wrap{flex:1;text-align:center;}
+  .summary-bar-bg{height:48px;background:#111;border-radius:6px;overflow:hidden;display:flex;flex-direction:column-reverse;margin-bottom:4px;border-width:1px;border-style:solid;}
+  .summary-bar-fill{transition:height 0.4s ease;}
+  .summary-d{font-size:9px;color:#444;letter-spacing:1px;}
+  .summary-c{font-size:9px;}
+  .modal-overlay{position:fixed;inset:0;background:#000a;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .modal{background:#12121A;border:1px solid #2A2A3A;border-radius:12px;padding:20px;width:100%;max-width:320px;}
+  .modal h3{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:16px;}
+  .modal input{width:100%;margin-bottom:10px;background:#1A1A28;border:1px solid #2A2A3A;border-radius:6px;padding:8px 12px;color:#fff;font-size:13px;}
+  .modal-btns{display:flex;gap:8px;margin-top:4px;}
+  .modal-save{flex:1;background:#7C3AED;border:none;border-radius:6px;padding:10px;color:#fff;font-size:12px;letter-spacing:1px;}
+  .modal-cancel{background:#1A1A28;border:1px solid #2A2A3A;border-radius:6px;padding:10px 14px;color:#666;font-size:12px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div>
+        <div class="title-label">WORKOUT TRACKER</div>
+        <div class="title-main">MY SCHEDULE</div>
+      </div>
+      <button class="edit-btn" id="editBtn" onclick="toggleEditMode()">✎ EDIT</button>
+    </div>
+    <div class="week-nav">
+      <button class="nav-btn" onclick="changeWeek(-1)">‹</button>
+      <div style="flex:1;text-align:center;">
+        <div class="week-label" id="weekLabel" style="color:#A78BFA;"></div>
+        <div class="week-sub" id="weekSub"></div>
+      </div>
+      <button class="nav-btn" onclick="changeWeek(1)">›</button>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="overallBar" style="background:linear-gradient(90deg,#FF6B35,#7C3AED);width:0%"></div>
+      </div>
+      <div class="progress-count" id="overallCount" style="color:#666;">0/0</div>
+    </div>
+  </div>
+</div>
+
+<div class="content" id="content"></div>
+
+<!-- Edit modal -->
+
+<div class="modal-overlay" id="editModal" style="display:none">
+  <div class="modal">
+    <h3>EDIT EXERCISE</h3>
+    <input id="editName" placeholder="Exercise name"/>
+    <input id="editSets" placeholder="Sets (e.g. 3)"/>
+    <input id="editReps" placeholder="Reps (e.g. 10-12)"/>
+    <div class="modal-btns">
+      <button class="modal-save" onclick="saveEditModal()">SAVE</button>
+      <button class="modal-cancel" onclick="closeEditModal()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PLAN_KEY = 'wt_plan_v2';
+const DATA_KEY = 'wt_data_v2';
+
+const defaultPlan = [
+  {day:"Day 1",title:"Upper Chest + Triceps",rest:"90 sec",color:"#FF6B35",
+   exercises:[
+    {name:"Incline Dumbbell Press",sets:"4",reps:"8-12"},
+    {name:"Flat Bench or Machine Press",sets:"3",reps:"8-10"},
+    {name:"Cable Fly",sets:"3",reps:"12-15"},
+    {name:"Rope Tricep Pushdown",sets:"3",reps:"12-15"},
+    {name:"Overhead Tricep Extension",sets:"3",reps:"12"},
+    {name:"Plank",sets:"2",reps:"45 sec"},
+  ]},
+  {day:"Day 2",title:"Shoulders + Biceps",rest:"60–90 sec",color:"#7C3AED",
+   note:"This day gives you shoulder width and arm thickness.",
+   exercises:[
+    {name:"Dumbbell Shoulder Press",sets:"4",reps:"8-10"},
+    {name:"Lateral Raises",sets:"4",reps:"12-15",important:true},
+    {name:"Rear Delt Fly",sets:"3",reps:"15"},
+    {name:"Barbell or DB Curl",sets:"3",reps:"10-12"},
+    {name:"Hammer Curl",sets:"3",reps:"12"},
+  ]},
+  {day:"Day 3",title:"Back + Light Legs",rest:"90 sec",color:"#059669",
+   exercises:[
+    {name:"Lat Pulldown",sets:"4",reps:"8-12"},
+    {name:"Seated Row",sets:"3",reps:"10-12"},
+    {name:"Face Pull",sets:"3",reps:"15"},
+    {name:"Leg Press or Squat",sets:"3",reps:"10"},
+    {name:"Romanian Deadlift",sets:"3",reps:"10"},
+  ]},
+];
+
+let plan = JSON.parse(localStorage.getItem(PLAN_KEY) || 'null') || JSON.parse(JSON.stringify(defaultPlan));
+let checkData = JSON.parse(localStorage.getItem(DATA_KEY) || '{}');
+let weekOffset = 0;
+let expandedDay = 0;
+let editMode = false;
+let editTarget = null; // {di, ei}
+
+function savePlan(){ localStorage.setItem(PLAN_KEY, JSON.stringify(plan)); }
+function saveData(){ localStorage.setItem(DATA_KEY, JSON.stringify(checkData)); }
+
+function getWeekKey(offset){
+  const now = new Date();
+  const mon = new Date(now);
+  mon.setDate(now.getDate() - ((now.getDay()+6)%7) + offset*7);
+  return `w_${mon.getFullYear()}_${mon.getMonth()}_${mon.getDate()}`;
+}
+function getWeekLabel(offset){
+  const now = new Date();
+  const mon = new Date(now);
+  mon.setDate(now.getDate() - ((now.getDay()+6)%7) + offset*7);
+  const sun = new Date(mon); sun.setDate(mon.getDate()+6);
+  const f = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  return [f(mon),f(sun)];
+}
+
+function weekKey(){ return getWeekKey(weekOffset); }
+function weekData(){ return checkData[weekKey()] || {}; }
+
+function toggleCheck(di,ei){
+  if(editMode) return;
+  const wk = weekKey();
+  if(!checkData[wk]) checkData[wk]={};
+  const k=`${di}_${ei}`;
+  checkData[wk][k] = !checkData[wk][k];
+  saveData();
+  render();
+  if(checkData[wk][k]){
+    const el = document.getElementById(`cb_${di}_${ei}`);
+    if(el){ el.classList.add('check-bounce'); setTimeout(()=>el.classList.remove('check-bounce'),700); }
+  }
+}
+
+function toggleAllDay(di){
+  const wk=weekKey();
+  if(!checkData[wk]) checkData[wk]={};
+  const total=plan[di].exercises.length;
+  const done=plan[di].exercises.filter((_,i)=>checkData[wk][`${di}_${i}`]).length;
+  const allDone=done===total;
+  plan[di].exercises.forEach((_,i)=>{ checkData[wk][`${di}_${i}`]=!allDone; });
+  saveData(); render();
+}
+
+function toggleDay(di){
+  expandedDay = expandedDay===di ? -1 : di;
+  render();
+}
+
+function toggleEditMode(){
+  editMode=!editMode;
+  document.getElementById('editBtn').className='edit-btn'+(editMode?' active':'');
+  document.getElementById('editBtn').textContent=editMode?'✓ DONE':'✎ EDIT';
+  render();
+}
+
+function changeWeek(d){ weekOffset+=d; render(); }
+
+function openEditModal(di,ei){
+  editTarget={di,ei};
+  const ex=plan[di].exercises[ei];
+  document.getElementById('editName').value=ex.name;
+  document.getElementById('editSets').value=ex.sets;
+  document.getElementById('editReps').value=ex.reps;
+  document.getElementById('editModal').style.display='flex';
+  setTimeout(()=>document.getElementById('editName').focus(),50);
+}
+
+function closeEditModal(){ document.getElementById('editModal').style.display='none'; editTarget=null; }
+
+function saveEditModal(){
+  if(!editTarget) return;
+  const {di,ei}=editTarget;
+  plan[di].exercises[ei].name=document.getElementById('editName').value||plan[di].exercises[ei].name;
+  plan[di].exercises[ei].sets=document.getElementById('editSets').value||plan[di].exercises[ei].sets;
+  plan[di].exercises[ei].reps=document.getElementById('editReps').value||plan[di].exercises[ei].reps;
+  savePlan(); closeEditModal(); render();
+}
+
+function addExercise(di){
+  plan[di].exercises.push({name:'New Exercise',sets:'3',reps:'10-12'});
+  savePlan(); render();
+  // auto-open edit for new exercise
+  setTimeout(()=>openEditModal(di,plan[di].exercises.length-1),50);
+}
+
+function removeExercise(di,ei){
+  plan[di].exercises.splice(ei,1);
+  // fix checkdata keys
+  const wk=weekKey();
+  if(checkData[wk]){
+    const newWk={};
+    Object.keys(checkData[wk]).forEach(k=>{
+      const [d,e]=k.split('_').map(Number);
+      if(d===di && e===ei) return;
+      if(d===di && e>ei) newWk[`${d}_${e-1}`]=checkData[wk][k];
+      else newWk[k]=checkData[wk][k];
+    });
+    checkData[wk]=newWk;
+    saveData();
+  }
+  savePlan(); render();
+}
+
+function getDayProgress(di){
+  const wd=weekData();
+  const total=plan[di].exercises.length;
+  const done=plan[di].exercises.filter((_,i)=>wd[`${di}_${i}`]).length;
+  return {done,total};
+}
+
+function getTotalProgress(){
+  const wd=weekData();
+  let done=0,total=0;
+  plan.forEach((day,di)=>day.exercises.forEach((_,ei)=>{ total++; if(wd[`${di}_${ei}`]) done++; }));
+  return {done,total};
+}
+
+function render(){
+  // Header
+  const [mon,sun]=getWeekLabel(weekOffset);
+  const wl=document.getElementById('weekLabel');
+  wl.textContent=weekOffset===0?'THIS WEEK':weekOffset===-1?'LAST WEEK':weekOffset>0?`+${weekOffset}W`:`${weekOffset}W`;
+  wl.style.color=weekOffset===0?'#A78BFA':'#666';
+  document.getElementById('weekSub').textContent=`${mon} – ${sun}`;
+
+  const {done:td,total:tt}=getTotalProgress();
+  const pct=tt?Math.round(td/tt*100):0;
+  const ob=document.getElementById('overallBar');
+  ob.style.width=pct+'%';
+  ob.style.background=pct===100?'#34D399':'linear-gradient(90deg,#FF6B35,#7C3AED)';
+  const oc=document.getElementById('overallCount');
+  oc.textContent=`${td}/${tt}${pct===100?' 🔥':''}`;
+  oc.style.color=pct===100?'#34D399':'#666';
+
+  // Days
+  const content=document.getElementById('content');
+  let html='';
+
+  plan.forEach((day,di)=>{
+    const {done,total}=getDayProgress(di);
+    const dpct=total?Math.round(done/total*100):0;
+    const allDone=done===total&&total>0;
+    const isOpen=expandedDay===di;
+    const wd=weekData();
+
+    html+=`<div class="day-card" style="border:1px solid ${isOpen?day.color+'44':'#1A1A28'}">`;
+
+    // Header
+    html+=`<div class="day-header" onclick="toggleDay(${di})">`;
+    html+=`<div class="day-icon" style="background:${day.color}18;border:1px solid ${day.color}33;color:${day.color}">`;
+    html+=allDone?'✓':`D${di+1}`;
+    html+=`</div>`;
+    html+=`<div class="day-info">`;
+    html+=`<div class="day-label" style="color:${day.color}">${day.day}</div>`;
+    html+=`<div class="day-title">${day.title}</div>`;
+    html+=`<div class="day-progress-row">`;
+    html+=`<div class="day-pb-bg"><div class="day-pb-fill" style="width:${dpct}%;background:${allDone?'#34D399':day.color}"></div></div>`;
+    html+=`<span class="day-count" style="color:${allDone?'#34D399':'#444'}">${done}/${total}</span>`;
+    html+=`</div></div>`;
+    html+=`<div class="all-btn" style="background:${allDone?'#34D39922':'#1A1A28'};border:1px solid ${allDone?'#34D399':'#2A2A3A'};color:${allDone?'#34D399':'#444'}" onclick="event.stopPropagation();toggleAllDay(${di})">${allDone?'DONE':'ALL'}</div>`;
+    html+=`<div class="chevron">${isOpen?'▲':'▼'}</div>`;
+    html+=`</div>`;
+
+    if(isOpen){
+      html+=`<div class="exercises-wrap" style="border-top-color:${day.color}22">`;
+      if(day.rest) html+=`<div class="rest-row">REST: ${day.rest}</div>`;
+
+      day.exercises.forEach((ex,ei)=>{
+        const checked=!!wd[`${di}_${ei}`];
+        html+=`<div class="ex-row" style="background:${checked?day.color+'08':'transparent'}">`;
+        html+=`<div class="checkbox" id="cb_${di}_${ei}" style="border-color:${checked?day.color:'#2A2A3A'};background:${checked?day.color+'22':'transparent'}" onclick="toggleCheck(${di},${ei})">`;
+        if(checked) html+=`<svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="${day.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        html+=`</div>`;
+        html+=`<div class="ex-info">`;
+        html+=`<div class="ex-name${checked?' done':''}">${ex.name}${ex.important?'<span class="key-tag">KEY</span>':''}</div>`;
+        html+=`<div class="ex-sets">${ex.sets} SETS × ${ex.reps}</div>`;
+        html+=`</div>`;
+        if(editMode){
+          html+=`<div class="ex-actions" style="opacity:1">`;
+          html+=`<button style="background:none;border:1px solid #2A2A3A;color:#666;width:26px;height:26px;border-radius:5px;font-size:12px" onclick="openEditModal(${di},${ei})">✎</button>`;
+          html+=`<button style="background:none;border:1px solid #3A1A1A;color:#663333;width:26px;height:26px;border-radius:5px;font-size:12px" onclick="removeExercise(${di},${ei})">×</button>`;
+          html+=`</div>`;
+        }
+        html+=`</div>`;
+      });
+
+      if(editMode){
+        html+=`<button class="add-ex-btn" style="color:#333" onmouseover="this.style.color='${day.color}'" onmouseout="this.style.color='#333'" onclick="addExercise(${di})"><span style="font-size:18px">+</span> Add Exercise</button>`;
+      }
+
+      if(day.note) html+=`<div class="note-row">"${day.note}"</div>`;
+      html+=`</div>`;
+    }
+
+    html+=`</div>`;
+  });
+
+  // Weekly summary
+  html+=`<div class="summary-card">`;
+  html+=`<div class="summary-label">WEEKLY SUMMARY</div>`;
+  html+=`<div class="summary-bars">`;
+  plan.forEach((day,di)=>{
+    const {done,total}=getDayProgress(di);
+    const p=total?done/total:0;
+    html+=`<div class="summary-bar-wrap">`;
+    html+=`<div class="summary-bar-bg" style="border-color:${p===1?day.color+'44':'#1A1A28'}">`;
+    html+=`<div class="summary-bar-fill" style="height:${p*100}%;background:${p===1?day.color:day.color+'66'}"></div>`;
+    html+=`</div>`;
+    html+=`<div class="summary-d">D${di+1}</div>`;
+    html+=`<div class="summary-c" style="color:${p===1?day.color:'#333'}">${done}/${total}</div>`;
+    html+=`</div>`;
+  });
+  html+=`</div></div>`;
+
+  content.innerHTML=html;
+}
+
+// Close modal on overlay click
+document.getElementById('editModal').addEventListener('click',function(e){
+  if(e.target===this) closeEditModal();
+});
+
+// Enter key in modal
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter' && document.getElementById('editModal').style.display==='flex') saveEditModal();
+  if(e.key==='Escape') closeEditModal();
+});
+
+render();
+</script>
+
+</body>
+</html>
