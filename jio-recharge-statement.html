@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jio Recharge Statement</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f0f2f5; color: #333; font-size: 13px; }
+
+    /* Header */
+    .header {
+      background: #1a2a5e;
+      color: #fff;
+      padding: 18px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header .logo-block .logo-text {
+      font-size: 36px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+    .header .logo-block .logo-text span { color: #00b4d8; }
+    .header .logo-block .company-name {
+      font-size: 11px;
+      color: #aac;
+      margin-top: 2px;
+      letter-spacing: 0.5px;
+    }
+    .header .statement-info { text-align: right; font-size: 12px; color: #cdd; line-height: 1.8; }
+    .header .statement-info .title { font-size: 15px; font-weight: bold; color: #fff; margin-bottom: 2px; }
+
+    /* Main wrapper */
+    .wrapper { max-width: 860px; margin: 24px auto; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.10); }
+
+    /* Section title bar */
+    .section-title-bar {
+      padding: 18px 28px 8px;
+      border-bottom: 1px solid #e8eaf0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .section-title-bar .main-title { font-size: 18px; font-weight: bold; color: #1a7fa8; }
+    .section-title-bar .sub-title { font-size: 12px; color: #888; margin-top: 2px; }
+    .section-title-bar .period-block { text-align: right; font-size: 11px; color: #888; }
+    .section-title-bar .period-block .period-label { font-size: 11px; color: #aaa; margin-bottom: 2px; }
+    .section-title-bar .period-block .period-dates { font-size: 14px; font-weight: bold; color: #1a7fa8; }
+
+    /* Two-column info */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      padding: 20px 28px;
+      border-bottom: 1px solid #e8eaf0;
+    }
+    .info-col { padding-right: 24px; }
+    .info-col:last-child { padding-right: 0; border-left: 1px solid #e8eaf0; padding-left: 24px; }
+    .info-col-label {
+      font-size: 10px;
+      font-weight: bold;
+      color: #1a7fa8;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .info-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .info-row .key { color: #888; font-size: 12px; }
+    .info-row .val { font-weight: bold; font-size: 12px; color: #222; text-align: right; }
+    .badge-active {
+      background: #e6faf0;
+      color: #2da062;
+      border: 1px solid #b2e6cc;
+      border-radius: 12px;
+      padding: 2px 10px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    /* Stats row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      padding: 20px 28px;
+      border-bottom: 1px solid #e8eaf0;
+    }
+    .stat-box {
+      border: 1px solid #dde3ee;
+      border-radius: 10px;
+      padding: 14px 16px;
+      text-align: center;
+    }
+    .stat-box.highlight {
+      background: #1a2a5e;
+      border-color: #1a2a5e;
+      color: #fff;
+    }
+    .stat-box .stat-label { font-size: 10px; color: #aaa; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .stat-box.highlight .stat-label { color: #aac; }
+    .stat-box .stat-value { font-size: 22px; font-weight: bold; color: #1a2a5e; line-height: 1; }
+    .stat-box.highlight .stat-value { color: #fff; }
+    .stat-box .stat-sub { font-size: 10px; color: #aaa; margin-top: 4px; }
+    .stat-box.highlight .stat-sub { color: #99aacc; }
+
+    /* Transaction table */
+    .txn-section { padding: 20px 28px 0; }
+    .txn-section-title { font-size: 15px; font-weight: bold; color: #1a7fa8; margin-bottom: 14px; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #1a2a5e; color: #fff; }
+    thead th { padding: 10px 12px; text-align: left; font-size: 12px; font-weight: 600; letter-spacing: 0.3px; }
+    thead th:first-child { border-radius: 6px 0 0 0; }
+    thead th:last-child { border-radius: 0 6px 0 0; text-align: right; }
+    tbody tr { border-bottom: 1px solid #eef0f5; }
+    tbody tr:nth-child(odd) { background: #fafbfd; }
+    tbody tr:nth-child(even) { background: #fff; }
+    tbody td { padding: 12px 12px; vertical-align: top; font-size: 12px; }
+    tbody td:last-child { text-align: right; font-weight: bold; }
+    .td-num { font-weight: bold; color: #555; width: 30px; }
+    .date-main { font-weight: bold; color: #222; }
+    .date-time { color: #aaa; font-size: 11px; }
+    .plan-name { font-weight: bold; color: #222; }
+    .plan-badge {
+      display: inline-block;
+      background: #ff6b35;
+      color: #fff;
+      font-size: 9px;
+      font-weight: bold;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    .plan-details { font-size: 11px; color: #1a7fa8; font-weight: 600; margin-top: 2px; }
+    .ref-main { font-weight: bold; color: #222; }
+    .ref-sub { color: #aaa; font-size: 11px; }
+    .badge-success {
+      display: inline-block;
+      background: #e6faf0;
+      color: #2da062;
+      border: 1px solid #b2e6cc;
+      border-radius: 12px;
+      padding: 3px 12px;
+      font-size: 11px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    .total-row td {
+      background: #1a2a5e !important;
+      color: #fff;
+      font-weight: bold;
+      font-size: 13px;
+      padding: 14px 12px;
+      border: none;
+    }
+    .total-row td:first-child { border-radius: 0 0 0 6px; }
+    .total-row td:last-child { border-radius: 0 0 6px 0; text-align: right; color: #7ad4f0; font-size: 15px; }
+    .total-label { text-align: right; font-size: 12px; color: #cce; }
+
+    /* Footer */
+    .footer {
+      background: #1a2a5e;
+      color: #cdd;
+      padding: 20px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-top: 28px;
+    }
+    .footer .footer-left .footer-company { font-weight: bold; color: #fff; font-size: 13px; margin-bottom: 6px; }
+    .footer .footer-left .footer-address { font-size: 11px; color: #99aacc; line-height: 1.7; }
+    .footer .footer-right { text-align: right; font-size: 11px; color: #99aacc; line-height: 1.8; }
+    .footer .footer-right a { color: #7ad4f0; text-decoration: none; font-weight: bold; }
+
+    /* Disclaimer */
+    .disclaimer {
+      background: #f8f9fc;
+      padding: 12px 28px;
+      font-size: 10px;
+      color: #aaa;
+      line-height: 1.6;
+      border-top: 1px solid #e8eaf0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Page Header -->
+  <div class="header">
+    <div class="logo-block">
+      <div class="logo-text">J<span>io</span></div>
+      <div class="company-name">Reliance Jio Infocomm Limited</div>
+    </div>
+    <div class="statement-info">
+      <div class="title">Recharge Statement</div>
+      <div>Generated: 30 Apr, 2026</div>
+      <div>Statement Ref: JIO/STM/2026/04/6304</div>
+      <div>CIN: U72900MH2007PLC231890</div>
+    </div>
+  </div>
+
+  <!-- Main Content Wrapper -->
+  <div class="wrapper">
+
+    <!-- Title Bar -->
+    <div class="section-title-bar">
+      <div>
+        <div class="main-title">Account Recharge History</div>
+        <div class="sub-title">Prepaid Mobile Account &mdash; Jio Number: 6304869686</div>
+      </div>
+      <div class="period-block">
+        <div class="period-label">Statement Period</div>
+        <div class="period-dates">01 Nov 2025 &ndash; 30 Apr 2026</div>
+      </div>
+    </div>
+
+    <!-- Account + Device Info -->
+    <div class="info-grid">
+      <div class="info-col">
+        <div class="info-col-label">Account Details</div>
+        <div class="info-row"><span class="key">Jio Number</span><span class="val">6304869686</span></div>
+        <div class="info-row"><span class="key">Account Type</span><span class="val">Prepaid</span></div>
+        <div class="info-row"><span class="key">Circle</span><span class="val">Andhra Pradesh &amp; Telangana</span></div>
+        <div class="info-row"><span class="key">Account Status</span><span class="val"><span class="badge-active">&#10003; Active</span></span></div>
+        <div class="info-row"><span class="key">Current Plan</span><span class="val">JIO &#x20B9;1299 / 84 Days</span></div>
+      </div>
+      <div class="info-col">
+        <div class="info-col-label">Device Information</div>
+        <div class="info-row"><span class="key">Device Model</span><span class="val">iPhone 15 Pro</span></div>
+        <div class="info-row"><span class="key">Manufacturer</span><span class="val">Apple Inc.</span></div>
+        <div class="info-row"><span class="key">IMEI Number</span><span class="val">358197541357200</span></div>
+        <div class="info-row"><span class="key">Network Band</span><span class="val">5G / LTE</span></div>
+        <div class="info-row"><span class="key">SIM Type</span><span class="val">eSIM / Nano SIM</span></div>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-label">Total Recharges</div>
+        <div class="stat-value">6</div>
+        <div class="stat-sub">Last 6 months</div>
+      </div>
+      <div class="stat-box highlight">
+        <div class="stat-label">Total Amount Paid</div>
+        <div class="stat-value">&#x20B9;7,782</div>
+        <div class="stat-sub">Nov 2025 &ndash; Apr 2026</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Active Plan Validity</div>
+        <div class="stat-value">84 Days</div>
+        <div class="stat-sub">Valid till 23 Jul 2026</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Data Benefit</div>
+        <div class="stat-value">2.5 GB</div>
+        <div class="stat-sub">Per day</div>
+      </div>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="txn-section">
+      <div class="txn-section-title">Recharge Transaction History</div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date &amp; Time</th>
+            <th>Plan Details</th>
+            <th>Payment Mode</th>
+            <th>Reference / Txn ID</th>
+            <th>Status</th>
+            <th style="text-align:right">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-num">1</td>
+            <td><div class="date-main">30 Apr, 2026</div><div class="date-time">05:40 PM</div></td>
+            <td>
+              <div class="plan-name">JIO &#x20B9;1299 Prepaid Plan <span class="plan-badge">LATEST</span></div>
+              <div class="plan-details">84 Days &bull; 2.5GB/Day &bull; Unlimited Calls</div>
+            </td>
+            <td>Wallet</td>
+            <td><div class="ref-main">BR0006X5PY84</div><div class="ref-sub">21112915177057042**4</div></td>
+            <td><span class="badge-success">&#10003; Success</span></td>
+            <td>&#x20B9;1,299</td>
+          </tr>
+          <tr>
+            <td class="td-num">2</td>
+            <td><div class="date-main">05 Feb, 2026</div><div class="date-time">11:22 AM</div></td>
+            <td>
+              <div class="plan-name">JIO &#x20B9;1299 Prepaid Plan</div>
+              <div class="plan-details">84 Days &bull; 2.5GB/Day &bull; Unlimited Calls</div>
+            </td>
+            <td>UPI (GPay)</td>
+            <td><div class="ref-main">BR0005K3MN61</div><div class="ref-sub">210523094881340217</div></td>
+            <td><span class="badge-success">&#10003; Success</span></td>
+            <td>&#x20B9;1,299</td>
+          </tr>
+          <tr>
+            <td class="td-num">3</td>
+            <td><div class="date-main">13 Nov, 2025</div><div class="date-time">09:15 AM</div></td>
+            <td>
+              <div class="plan-name">JIO &#x20B9;1299 Prepaid Plan</div>
+              <div class="plan-details">84 Days &bull; 2.5GB/Day &bull; Unlimited Calls</div>
+            </td>
+            <td>Debit Card</td>
+            <td><div class="ref-main">BR0004R7WP42</div><div class="ref-sub">20988102366041239**8</div></td>
+            <td><span class="badge-success">&#10003; Success</span></td>
+            <td>&#x20B9;1,299</td>
+          </tr>
+          <tr>
+            <td class="td-num">4</td>
+            <td><div class="date-main">21 Aug, 2025</div><div class="date-time">03:48 PM</div></td>
+            <td>
+              <div class="plan-name">JIO &#x20B9;1299 Prepaid Plan</div>
+              <div class="plan-details">84 Days &bull; 2.5GB/Day &bull; Unlimited Calls</div>
+            </td>
+            <td>UPI (PhonePe)</td>
+            <td><div class="ref-main">BR0003T2VX19</div><div class="ref-sub">208734510092876543</div></td>
+            <td><span class="badge-success">&#10003; Success</span></td>
+            <td>&#x20B9;1,299</td>
+          </tr>
+          <tr>
+            <td class="td-num">5</td>
+            <td><div class="date-main">29 May, 2025</div><div class="date-time">07:30 PM</div></td>
+            <td>
+              <div class="plan-name">JIO &#x20B9;1188 Prepaid Plan</div>
+              <div class="plan-details">84 Days &bull; 2GB/Day &bull; Unlimited Calls</div>
+            </td>
+            <td>Net Banking</td>
+            <td><div class="ref-main">BR0002H9LQ87</div><div class="ref-sub">207612308871234567</div></td>
+            <td><span class="badge-success">&#10003; Success</span></td>
+            <td>&#x20B9;1,188</td>
+          </tr>
+          <tr>
+            <td class="td-num">6</td>
+            <td><div class="date-main">06 Mar, 2025</div><div class="date-time">01:10 PM</div></td>
+            <td>
+              <div class="plan-name">JIO &#x20B9;1188 Prepaid Plan</div>
+              <div class="plan-details">84 Days &bull; 2GB/Day &bull; Unlimited Calls</div>
+            </td>
+            <td>Wallet</td>
+            <td><div class="ref-main">BR0001A4ZD55</div><div class="ref-sub">206500178993412001</div></td>
+            <td><span class="badge-success">&#10003; Success</span></td>
+            <td>&#x20B9;1,188</td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="6" class="total-label">TOTAL AMOUNT PAID (6 Recharges)</td>
+            <td>&#x20B9;7,572</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div class="footer-left">
+        <div class="footer-company">Reliance Jio Infocomm Limited</div>
+        <div class="footer-address">
+          Registered Office: Jio World Centre, Bandra-Kurla Complex,<br>
+          Bandra (East), Mumbai &ndash; 400051, Maharashtra, India.<br>
+          CIN: U72900MH2007PLC231890 &bull; PAN: AAACR5055K
+        </div>
+      </div>
+      <div class="footer-right">
+        <div><a href="#">www.jio.com</a></div>
+        <div>Customer Care: 199 / 198</div>
+        <div>Email: care@jio.com</div>
+        <div>This is a system-generated statement.</div>
+      </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer">
+      *This statement is for information purposes only. All recharge amounts are inclusive of applicable taxes.
+      For disputes or queries, please contact Jio Customer Care at 199 or visit your nearest Jio Store.
+      Validity and plan benefits are subject to Jio&rsquo;s terms and conditions.
+    </div>
+
+  </div>
+
+</body>
+</html>
